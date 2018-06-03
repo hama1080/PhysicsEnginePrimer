@@ -50,6 +50,14 @@ PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, 
 	return dynamic;
 }
 
+// Create Static Rigidbody
+PxRigidStatic* createStatic(const PxTransform& t, const PxGeometry& geometry, PxMaterial& material)
+{
+	PxRigidStatic* static_actor = PxCreateStatic(*gPhysics, t, geometry, material);
+	gScene->addActor(*static_actor);
+	return static_actor;
+}
+
 // Proceed the step of physics environment
 void stepPhysics()
 {
@@ -65,11 +73,10 @@ int main(void)
 
 	PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);	//static friction, dynamic friction, restitution
 
-	// create plate as kinematic rigid body
-	PxRigidDynamic* plate = createDynamic(PxTransform(PxVec3(0)), PxBoxGeometry(10.0f, 0.1f, 10.0f), *material);
-	plate->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
-	// drop various rigid bodies
+	// create plate as static rigid body
+	createStatic(PxTransform(PxVec3(0)), PxBoxGeometry(10.0f, 0.1f, 10.0f), *material);
+	
+	// create various rigid bodies
 	createDynamic(PxTransform((PxVec3(1.5f, 11.5f, 0.0f))), PxSphereGeometry(0.3f), *material);
 	createDynamic(PxTransform((PxVec3(0.0f, 10.0f, 0.0f))), PxSphereGeometry(0.5f), *material);
 	createDynamic(PxTransform((PxVec3(-0.5f, 8.5f, 0.0f))), PxSphereGeometry(0.7f), *material);
