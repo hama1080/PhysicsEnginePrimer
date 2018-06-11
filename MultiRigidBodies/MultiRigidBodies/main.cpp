@@ -68,7 +68,7 @@ void stepPhysics()
 int main(void)
 {
 	initPhysics();
-	cout << "Free Fall" << endl;
+	cout << "Multi Rigid Bodies" << endl;
 	cout << "Start physics process" << endl;
 
 	PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);	//static friction, dynamic friction, restitution
