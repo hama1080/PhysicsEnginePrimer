@@ -1,16 +1,26 @@
-LearnPhysX
+## 概要
+2019年4月14日開催の技術書典6において頒布した"物理エンジンを触ってみよう"内に記載のサンプルプログラムを格納したリポジトリです。  
+※PhysXの導入先はC:\PhysXとしています。変更する場合はVisual Studioでプロパティページを開き、インクルードディレクトリおよびライブラリディレクトリを変更するか、~.vcxprojファイルを直接編集してください。
 
-## PhysX Hello World  
+![cover](./cover.png)  
 
-## Free Fall  
-![freefall_gif](https://github.com/hama903/LearnPhysX/blob/master/gif/FreeFall.gif)  
+### PhysXHelloWorld  
 
-## Multi Rigidbodies  
-![multirb_gif](https://github.com/hama903/LearnPhysX/blob/master/gif/MultiRigidBodies.gif)  
+球が落下するようなプログラムです。
 
-## Domino  
-![domino_gif](https://github.com/hama903/LearnPhysX/blob/master/gif/Domino.gif)  
+![PhysXHelloWorld_gif](./gif/PhysXHelloWorld.gif)  
 
-## UnionRigidBodies  
-![unionrb_gif](https://github.com/hama903/LearnPhysX/blob/master/gif/UnionRigidBodies.gif)  
+### PhysXJoint
+
+ジョイントにより2つの剛体を接続するプログラムです。
+
+![PhysXHelloWorld_gif](./gif/PhysXJoint.gif)  
+
+### PhysXPitagora
+
+簡単なピタゴラ装置のプログラムです。
+STLファイル書き出し用のプログラムも含んでいます。
+書き出したSTLファイルをBlenderなどで読み込むことで、表紙のような絵のレンダリングが可能となります。
+
+![PhysXHelloWorld_gif](./gif/PhysXPitagora.gif)  
 
