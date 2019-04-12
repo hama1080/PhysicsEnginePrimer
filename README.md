@@ -12,7 +12,7 @@
 
 ### PhysXJoint
 
-ジョイントにより2つの剛体を接続するプログラムです。
+ジョイントにより2つの剛体を接続し、落下により破壊するプログラムです。
 
 ![PhysXHelloWorld_gif](./gif/PhysXJoint.gif)  
 
