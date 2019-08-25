@@ -15,12 +15,12 @@ PxPvd*                  gPvd = NULL;
 
 PxRigidDynamic* gPusher = NULL;
 
-// PhysX�̏�����
+// PhysXの初期化
 void initPhysics()
 {
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
-	// PVD�̐ݒ�
+	// PVDの設定
 	gPvd = PxCreatePvd(*gFoundation);
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("localhost", 5425, 10);
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
@@ -28,7 +28,7 @@ void initPhysics()
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 	PxInitExtensions(*gPhysics, gPvd);
 
-	// Scene�̍쐬
+	// Sceneの作成
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);          // Right-hand coordinate system, Y-UP.
 	gDispatcher = PxDefaultCpuDispatcherCreate(0);         // The number of worker threads is one.
@@ -38,7 +38,7 @@ void initPhysics()
 
 	gScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 
-	// PVD�̐ݒ�
+	// PVDの設定
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
 	{
@@ -48,7 +48,7 @@ void initPhysics()
 	}
 }
 
-// Dynamic Rigidbody�̍쐬
+// Dynamic Rigidbodyの作成
 PxRigidDynamic* createDynamic(const PxTransform& t,
 	const PxGeometry& geometry, PxMaterial& material, PxReal density = 10.0f)
 {
@@ -58,7 +58,7 @@ PxRigidDynamic* createDynamic(const PxTransform& t,
 	return rigid_dynamic;
 }
 
-// Static Rigidbody�̍쐬
+// Static Rigidbodyの作成
 PxRigidStatic* createStatic(const PxTransform& t,
 	const PxGeometry& geometry, PxMaterial& material)
 {
@@ -68,7 +68,7 @@ PxRigidStatic* createStatic(const PxTransform& t,
 }
 
 
-// �V�~�����[�V�����X�e�b�v��i�߂�
+// シミュレーションステップを進める
 void stepPhysics()
 {
 	const PxReal kElapsedTime = 1.0f / 60.0f; // 60Hz
@@ -78,16 +78,16 @@ void stepPhysics()
 
 void createPitagoraScene()
 {
-	// �Ö��C�W���A�����C�W���A�����W���̏�
+	// 静摩擦係数、動摩擦係数、反発係数の順
 	PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	////// �s�^�S�����u�̃t�B�[���h���쐬(static rigid body)
+	////// ピタゴラ装置のフィールドを作成(static rigid body)
 	// base plate(12m x 0.2m x 10m)
 	const PxVec3 kPlateHalf(6.0f, 0.1f, 5.0f);
 	createStatic(PxTransform(PxVec3(kPlateHalf.x, 0.0f, kPlateHalf.z)),
 		PxBoxGeometry(kPlateHalf), *material);
 
-	// �i��0
+	// 段差0
 	const PxVec3 kStepHalf0(2.0f, 0.5f, 5.0f);
 	createStatic(PxTransform(
 		PxVec3(
@@ -96,7 +96,7 @@ void createPitagoraScene()
 			kStepHalf0.z)
 	), PxBoxGeometry(kStepHalf0), *material);
 
-	// �i��1
+	// 段差1
 	const PxVec3 kStepHalf1(4.0f, 0.5f, 1.0f);
 	createStatic(PxTransform(
 		PxVec3(
@@ -105,7 +105,7 @@ void createPitagoraScene()
 			kStepHalf1.z)
 	), PxBoxGeometry(kStepHalf1), *material);
 
-	// �i��2
+	// 段差2
 	const PxVec3 kStepHalf2(0.3f, 0.5f, 1.0f);
 	createStatic(PxTransform(
 		PxVec3(
@@ -125,7 +125,7 @@ void createPitagoraScene()
 		PxQuat(kSlopeAngle, PxVec3(0.0f, 0.0f, 1.0f))
 	), PxBoxGeometry(kSlopeHalf), *material);
 
-	////// �����쐬(dynamic rigid body)
+	////// 球を作成(dynamic rigid body)
 	const PxReal kSphereR = 0.25f;
 	PxRigidDynamic* sphere = createDynamic(
 		PxTransform(
@@ -135,7 +135,7 @@ void createPitagoraScene()
 				kStepHalf2.z)
 		), PxSphereGeometry(kSphereR), *material);
 
-	///// �����������̂��쐬(kinematic actor)
+	///// 球を押す剛体を作成(kinematic actor)
 	const PxVec3 kPusherHalf(0.5f, 0.05f, 0.2f);
 	gPusher = createDynamic(PxTransform(
 		PxVec3(
@@ -145,7 +145,7 @@ void createPitagoraScene()
 	), PxBoxGeometry(kPusherHalf), *material);
 	gPusher->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
-	///// �h�~�m���쐬
+	///// ドミノを作成
 	const PxU32 kDominoCnt = 20;
 	const PxBoxGeometry kDominoGeometry(0.05f, 0.5f, 0.2f);
 	const PxReal kCircleR = kStepHalf0.x * 1.5f;
@@ -164,7 +164,7 @@ void createPitagoraScene()
 			kDominoGeometry, *material);
 	}
 
-	///// �U��q���쐬
+	///// 振り子を作成
 	const PxVec3 kChainCenter
 		= kCircleCenter + kCircleR * PxVec3(0.0f, 0.0f, 1.0f) + PxVec3(-3.0f, 0.0f, 0.0f);
 	const PxReal kChainLength = 5.0f;
@@ -174,7 +174,7 @@ void createPitagoraScene()
 	const PxReal kLastElementR = kElementR * 3.0f;
 	const PxReal kChainAngle = PxPi / 6.0f; // 30 degree
 
-	// �U��q�̃t�b�N���쐬(static rigid body)
+	// 振り子のフックを作成(static rigid body)
 	PxRigidActor* chain_hook = createStatic(
 		PxTransform(kChainCenter + PxVec3(0, kChainLength, 0)),
 		PxBoxGeometry(0.5f, kHookHalfHeight, 0.1f), *material);
@@ -188,7 +188,7 @@ void createPitagoraScene()
 			elementPosFromHook = (kHookHalfHeight + kElementR) + (kElementR * 2)*i;
 			sphere = PxSphereGeometry(kElementR);
 		}
-		else { // �Ō�̗v�f�̔��a��傫��
+		else { // 最後の要素の半径を大きく
 			elementPosFromHook = (kHookHalfHeight + kElementR)
 				+ (kElementR * 2) * (i - 1) + (kElementR + kLastElementR);
 			sphere = PxSphereGeometry(kLastElementR);
@@ -207,9 +207,9 @@ void createPitagoraScene()
 				PxVec3(0.0f, 0.0f, 1.0f)) * PxQuat(kChainAngle, PxVec3(0.0f, 0.0f, 1.0f))
 		), sphere, *material, 1.0f);
 
-		//position iteration count�̐ݒ�
+		//position iteration countの設定
 		element->setSolverIterationCounts(64, 1);
-		element->putToSleep();  // actor���X���[�v������
+		element->putToSleep();  // actorをスリープさせる
 		actor1 = element;
 
 		PxReal jointPosFromHook = kHookHalfHeight + (kElementR * 2) * i;
@@ -237,10 +237,10 @@ void createPitagoraScene()
 		actor0 = element;
 	}
 
-	///// �\�������쐬
+	///// 構造物を作成
 	const PxVec3 kStructureCenter
 		= PxVec3(kChainCenter.x, kPlateHalf.y, kChainCenter.z)
-		+ PxVec3(-3.0f, 0.0f, -1.25f);  // �I�t�Z�b�g
+		+ PxVec3(-3.0f, 0.0f, -1.25f);  // オフセット
 	const PxU32 kStructureCnt = 7;
 	const PxReal kStructureLength = 0.2f;
 
@@ -256,7 +256,7 @@ void createPitagoraScene()
 				PxRigidDynamic* element = createDynamic(
 					PxTransform(kElementPos),
 					PxBoxGeometry(kStructureLength, kStructureLength, kStructureLength),
-					*material, 0.01f); // ���₷�����邽�߂Ɍy������
+					*material, 0.01f); // 壊れやすくするために軽くする
 
 				element->putToSleep();
 			}
@@ -284,7 +284,7 @@ int main(void)
 	}
 	cout << "End simulation" << endl;
 
-	// STL�t�@�C���̏����o��
+	// STLファイルを書き出す
 	/*
 	PxActorTypeFlags desired_types
 		= PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC;
